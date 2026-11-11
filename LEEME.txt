@@ -1,0 +1,39 @@
+FITOPATOLOGÍAS AGUACATE - VERSIÓN 3.0 (SIN REGISTRO + CLASIFICACIÓN AUTOMÁTICA)
+
+ARCHIVOS PARA PUBLICAR (GitHub Pages / Netlify / cualquier hosting estático)
+- index.html
+- manifest.json
+- sw.js
+- icon-192.png
+- icon-512.png
+
+CAMBIOS PRINCIPALES RESPECTO A VERSIONES ANTERIORES
+1. SE ELIMINÓ completamente el registro de usuario, login y perfil de cuenta.
+2. La app abre directo al módulo de Diagnóstico (sin pantalla de autenticación).
+3. CLASIFICACIÓN AUTOMÁTICA DE VARIEDAD: al analizar la foto, el motor extrae
+   brillo medio, textura (σ), oscuridad y verdor, y aplica reglas expertas
+   ponderadas para identificar Hass, Criollo o Papelillo con porcentaje de confianza.
+4. La pestaña «Variedad» (Historia) se actualiza AUTOMÁTICAMENTE después de cada análisis.
+5. Catálogo de fitopatologías ampliado a 20 entidades con descripciones extensas
+   de síntomas, manejo cultural, biológico y químico.
+6. GPS del celular (Geolocation API, alta precisión) sin necesidad de cuenta.
+7. PWA instalable: se puede «descargar» / añadir a pantalla de inicio y usar offline.
+8. Botón para compartir el enlace por WhatsApp desde la pestaña Manual.
+
+CÓMO PUBLICAR Y COMPARTIR POR WHATSAPP
+1. Sube los 5 archivos a la raíz de un repositorio GitHub y activa GitHub Pages
+   (Settings → Pages → Branch main / root), o usa Netlify Drop / Cloudflare Pages.
+2. Obtén la URL pública (ej. https://tuusuario.github.io/fitopatologias-aguacate/).
+3. Comparte esa URL por WhatsApp. Quien la abra en el celular puede:
+   - Usarla al instante en el navegador.
+   - Instalarla como app (Chrome: menú → Instalar aplicación / Añadir a inicio).
+4. Una vez instalada funciona offline y no requiere crear cuenta.
+
+ALCANCE TÉCNICO
+El clasificador de variedad es un sistema de reglas expertas sobre descriptores de
+bajo nivel (Canvas + ImageData). No es un modelo de deep learning. La precisión
+depende de la calidad de la fotografía. No sustituye diagnóstico de laboratorio
+ni disposiciones oficiales del ICA.
+
+Autor original del concepto y documentación de registro: Andrés Felipe Herrera Rodríguez.
+Versión funcional ajustada según requerimientos del asesor de grado (2026).

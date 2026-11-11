@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f3d2e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fitopatologías Aguacate">
+<meta name="description" content="Sistema Profesional de Diagnóstico Fitosanitario de Aguacate - Clasificación automática de variedad y catálogo de patologías (AGROSAVIA / ICA)">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>Fitopatologías Aguacate | Diagnóstico Profesional</title>
+<style>
+:root {
+  --primary: #0f3d2e;
+  --primary-dark: #0b1f17;
+  --accent: #2d8a5e;
+  --accent-light: #3cb371;
+  --card: #ffffff;
+  --bg: #f0f5f2;
+  --text: #1a2e24;
+  --muted: #5a7266;
+  --border: #d4e5db;
+  --danger: #c53030;
+  --warning: #d69e2e;
+  --success: #276749;
+  --shadow: 0 8px 24px rgba(15,61,46,0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.topbar {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  color: #fff;
+  padding: 14px 18px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.topbar h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
+.topbar p { font-size: 0.72rem; opacity: 0.85; margin-top: 2px; }
+.content { padding: 14px 14px 90px; max-width: 640px; margin: 0 auto; }
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.card-title { font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+.card-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; line-height: 1.4; }
+.info-box {
+  background: #e8f5ee;
+  border-left: 4px solid var(--accent);
+  padding: 10px 12px;
+  border-radius: 0 10px 10px 0;
+  font-size: 0.82rem;
+  color: var(--primary);
+  margin-bottom: 14px;
+  line-height: 1.45;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.btn:active { transform: scale(0.98); opacity: 0.9; }
+.btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%); }
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+.btn-sm { padding: 8px 12px; font-size: 0.82rem; width: auto; }
+.hidden { display: none !important; }
+#preview {
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #e8f0eb;
+  margin: 10px 0;
+  display: none;
+  border: 2px dashed var(--border);
+}
+#preview.show { display: block; }
+.gps-box {
+  background: #f7faf8;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 12px 0;
+  font-size: 0.84rem;
+}
+.gps-box #gps-text { color: var(--muted); word-break: break-all; }
+.result-panel {
+  display: none;
+  background: linear-gradient(165deg, #f0faf4 0%, #e6f4ec 100%);
+  border: 1px solid #b8d9c6;
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 14px;
+}
+.result-panel.show { display: block; animation: fadeIn 0.3s ease; }
+.result-panel h3 { color: var(--primary); font-size: 1rem; margin-bottom: 8px; }
+.result-panel .badge {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin: 4px 4px 4px 0;
+}
+.result-panel .badge.hass { background: #1a365d; }
+.result-panel .badge.criollo { background: #276749; }
+.result-panel .badge.papelillo { background: #744210; }
+.confidence-bar {
+  height: 8px;
+  background: #d4e5db;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0 12px;
+}
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.analysis-warning {
+  background: #fffbeb;
+  border: 1px solid #f6e05e;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: #744210;
+  margin-top: 12px;
+  line-height: 1.4;
+}
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  z-index: 100;
+  border-top: 1px solid var(--border);
+}
+.nav-item {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 10px;
+  min-width: 60px;
+}
+.nav-item span { font-size: 1.25rem; }
+.nav-item.active { color: var(--primary); background: #e8f5ee; }
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--muted);
+}
+.empty-state span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+.empty-state p { font-size: 0.88rem; line-height: 1.5; }
+.plaga-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.plaga-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  background: #fafcfa;
+}
+.plaga-header:active { background: #eef6f1; }
+.plaga-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.plaga-header h4 { font-size: 0.88rem; font-weight: 700; flex: 1; line-height: 1.3; }
+.plaga-cat {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #edf2f7;
+  color: var(--muted);
+}
+.plaga-body {
+  display: none;
+  padding: 0 14px 14px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  border-top: 1px solid var(--border);
+}
+.plaga-body.open { display: block; }
+.plaga-body h5 { color: var(--primary); margin: 10px 0 4px; font-size: 0.8rem; }
+.search-box { margin-bottom: 12px; }
+.search-box input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  background: #fafcfa;
+}
+.search-box input:focus { outline: none; border-color: var(--accent); }
+.historia-block { margin-bottom: 14px; }
+.historia-block h4 {
+  color: var(--primary);
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  border-bottom: 2px solid #d4e5db;
+  padding-bottom: 4px;
+}
+.historia-block p { font-size: 0.84rem; line-height: 1.5; color: var(--text); }
+.gallery-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  background: #fafcfa;
+  cursor: pointer;
+}
+.gallery-item img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #e8f0eb;
+}
+.gallery-item .meta { flex: 1; min-width: 0; }
+.gallery-item .meta strong { font-size: 0.88rem; display: block; margin-bottom: 2px; }
+.gallery-item .meta span { font-size: 0.75rem; color: var(--muted); display: block; }
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.filter-btn {
+  background: #eef6f1;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+.filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.stat-box {
+  background: #e8f5ee;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+.stat-box .num { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+.stat-box .lbl { font-size: 0.7rem; color: var(--muted); }
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: #fff;
+  border-radius: 18px;
+  padding: 20px;
+  max-width: 420px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: var(--primary); }
+.form-group textarea, .form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.install-banner {
+  background: linear-gradient(135deg, #1a365d, #2c5282);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.84rem;
+}
+.install-banner.show { display: flex; }
+.install-banner button {
+  background: #fff;
+  color: #1a365d;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.progress-steps {
+  display: flex;
+  gap: 6px;
+  margin: 12px 0;
+}
+.progress-steps .step {
+  flex: 1;
+  height: 4px;
+  background: #d4e5db;
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+.progress-steps .step.done { background: var(--accent); }
+.progress-steps .step.active { background: var(--accent-light); animation: pulse 0.8s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🥑 Fitopatologías Aguacate</h1>
+  <p>Diagnóstico Profesional • Clasificación Automática • AGROSAVIA / ICA</p>
+</div>
+
+<div class="content">
+
+  <div id="page-diagnostico" class="page active">
+    <div id="install-banner" class="install-banner">
+      <div>📱 Instala la app en tu celular para usarla offline y compartirla fácilmente.</div>
+      <button onclick="instalarApp()">Instalar</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Nuevo Diagnóstico de Campo</div>
+      <div class="card-sub">Toma o carga una foto del fruto. La app identifica automáticamente la variedad (Hass, Criollo o Papelillo) y sugiere patologías asociadas.</div>
+      <div class="info-box">
+        Para mejores resultados: fotografía nítida, iluminación natural, fondo contrastante y el fruto ocupando la mayor parte del encuadre. La clasificación usa análisis de color, brillo y textura (no es un modelo de deep learning).
+      </div>
+
+      <img id="preview" alt="Vista previa de la fotografía">
+      <div class="btn-row">
+        <button class="btn" onclick="document.getElementById('input-galeria').click()">📁 Galería</button>
+        <button class="btn btn-primary" onclick="document.getElementById('input-camara').click()">📷 Cámara</button>
+      </div>
+      <input type="file" id="input-galeria" accept="image/*" class="hidden" onchange="cargarImagen(event)">
+      <input type="file" id="input-camara" accept="image/*" capture="environment" class="hidden" onchange="cargarImagen(event)">
+
+      <div class="gps-box">
+        <div style="font-weight:700;font-size:0.84rem;margin-bottom:6px;color:var(--primary)">📍 Ubicación de campo (GPS del celular)</div>
+        <div id="gps-text">Presiona el botón para capturar coordenadas reales del dispositivo.</div>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px;width:auto" onclick="obtenerGPS()">Obtener ubicación GPS</button>
+      </div>
+
+      <div class="form-group">
+        <label>Notas / Observaciones de campo (opcional)</label>
+        <textarea id="notas" rows="2" placeholder="Síntomas visibles, zona del árbol, severidad, fecha de siembra..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" id="btn-analizar" onclick="ejecutarDiagnostico()" disabled style="opacity:0.5">🔬 Analizar fotografía y diagnosticar</button>
+
+      <div id="resultado-analisis" class="result-panel"></div>
+    </div>
+  </div>
+
+  <div id="page-galeria" class="page">
+    <div class="card">
+      <div class="card-title">Galería de Diagnósticos</div>
+      <div class="card-sub">Registros guardados localmente en este dispositivo (offline)</div>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filtrarGaleria('todos', this)">Todos</button>
+        <button class="filter-btn" onclick="filtrarGaleria('hass', this)">Hass</button>
+        <button class="filter-btn" onclick="filtrarGaleria('criollo', this)">Criollo</button>
+        <button class="filter-btn" onclick="filtrarGaleria('papelillo', this)">Papelillo</button>
+      </div>
+      <div id="galeria-contenido"></div>
+    </div>
+  </div>
+
+  <div id="page-historia" class="page">
+    <div class="card">
+      <div class="card-title">Información de la Variedad</div>
+      <div class="card-sub">Se actualiza automáticamente cada vez que analizas una fotografía</div>
+      <div id="contenido-historia">
+        <div class="empty-state">
+          <span>📖</span>
+          <p>Realiza un diagnóstico con una fotografía para ver aquí la ficha completa de la variedad identificada (origen, rasgos, susceptibilidad y manejo).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-catalogo" class="page">
+    <div class="card">
+      <div class="card-title">Catálogo de Fitopatologías</div>
+      <div class="card-sub">20 entidades de importancia económica y cuarentenaria • AGROSAVIA / ICA Colombia</div>
+      <div class="search-box">
+        <input type="text" id="buscar-plaga" placeholder="Buscar por nombre científico o común..." oninput="filtrarCatalogo()">
+      </div>
+      <div id="lista-plagas"></div>
+    </div>
+  </div>
+
+  <div id="page-manuales" class="page">
+    <div class="card">
+      <div class="card-title">Manual de Uso Rápido</div>
+      <div class="card-sub">Guía de operación en campo</div>
+      <div class="historia-block">
+        <h4>1. Captura de la fotografía</h4>
+        <p>Usa la cámara del celular o selecciona una imagen de la galería. Procura buena iluminación natural, fondo contrastante y que el fruto ocupe la mayor parte del encuadre.</p>
+      </div>
+      <div class="historia-block">
+        <h4>2. Ubicación GPS</h4>
+        <p>Presiona «Obtener ubicación GPS». El sistema usa el GPS del dispositivo (Geolocation API) con alta precisión. Autoriza el permiso cuando el navegador lo solicite.</p>
+      </div>
+      <div class="historia-block">
+        <h4>3. Análisis automático</h4>
+        <p>Al presionar «Analizar», la app extrae brillo medio, textura (desviación estándar), oscuridad y verdor de la imagen. Con reglas expertas ponderadas identifica la variedad más probable (Hass, Criollo o Papelillo) y el nivel de confianza.</p>
+      </div>
+      <div class="historia-block">
+        <h4>4. Resultado y historia</h4>
+        <p>Se muestra la variedad detectada, confianza, patologías prioritarias asociadas y recomendaciones de manejo integrado (cultural, biológico y químico). La pestaña «Variedad» se actualiza automáticamente con la ficha de la variedad identificada.</p>
+      </div>
+      <div class="historia-block">
+        <h4>5. Galería y privacidad</h4>
+        <p>Puedes guardar el diagnóstico en el dispositivo. Todo permanece local: no se envían imágenes ni coordenadas a servidores externos. La app funciona completamente offline una vez instalada como PWA.</p>
+      </div>
+      <div class="historia-block">
+        <h4>Alcance del sistema</h4>
+        <p>Herramienta de apoyo técnico-académico y de extensión rural. No sustituye el diagnóstico de laboratorio ni las disposiciones oficiales del ICA. Ante sospecha de plagas cuarentenarias contacte de inmediato a la oficina local del ICA.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Instalar / Compartir la aplicación</div>
+      <p style="font-size:0.84rem;line-height:1.5;margin-bottom:10px">Esta es una Progressive Web App (PWA). En Android (Chrome): menú ⋮ → «Instalar aplicación» o «Añadir a pantalla de inicio». En iOS (Safari): botón Compartir → «Añadir a pantalla de inicio». Una vez instalada funciona offline y se puede compartir el enlace por WhatsApp.</p>
+      <button class="btn btn-outline" onclick="compartirApp()">📲 Compartir enlace por WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-item active" onclick="mostrarPagina('diagnostico', this)"><span>📝</span>Diagnóstico</button>
+  <button class="nav-item" onclick="mostrarPagina('galeria', this)"><span>🖼️</span>Galería</button>
+  <button class="nav-item" onclick="mostrarPagina('historia', this)"><span>📖</span>Variedad</button>
+  <button class="nav-item" onclick="mostrarPagina('catalogo', this)"><span>🧪</span>Catálogo</button>
+  <button class="nav-item" onclick="mostrarPagina('manuales', this)"><span>📘</span>Manual</button>
+</nav>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div id="modal-contenido"></div>
+    <button class="btn btn-outline" style="margin-top:16px" onclick="cerrarModal()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW registrado'))
+      .catch(e => console.log('SW error', e));
+  });
+}
+
+const PLAGAS = [
+  {
+    nombre: "Heilipus lauri Boheman (Picudo grande de la semilla)",
+    categoria: "Cuarentenaria",
+    color: "#dc2626",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "La hembra adulta perfora el epicarpio del fruto en desarrollo e introduce los huevos. Las larvas barrenan la pulpa hasta alcanzar la semilla, donde completan su desarrollo alimentándose del embrión. Externamente se observan orificios de oviposición y, en estados avanzados, salida de aserrín o goma. Los frutos afectados caen prematuramente o presentan pudriciones secundarias. En plantaciones sin manejo las pérdidas pueden superar el 60 % de la producción comercial.",
+    cultural: "Monitoreo semanal de frutos desde cuaje hasta cosecha. Recolección y destrucción inmediata (quema o enterrado con cal) de frutos caídos e infestados. Eliminación de hospederos alternos. Uso de trampas de captura de adultos cuando estén validadas localmente. Evitar el traslado de material vegetal sin certificación fitosanitaria.",
+    biologico: "Aplicación de hongos entomopatógenos Beauveria bassiana y Metarhizium anisopliae sobre el suelo y la copa en focos detectados. Conservación de enemigos naturales mediante coberturas vegetales y reducción de insecticidas de amplio espectro.",
+    quimico: "Solo productos autorizados por el ICA y aplicados de manera focalizada en focos confirmados. Respetar períodos de carencia y rotación de ingredientes activos para evitar resistencia. Priorizar moléculas de baja toxicidad para polinizadores."
+  },
+  {
+    nombre: "Stenoma catenifer Walsingham (Polilla del aguacate)",
+    categoria: "Cuarentenaria",
+    color: "#dc2626",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Las larvas penetran el fruto dejando orificios con aserrín fino y sedas. En el interior se alimentan de la pulpa y pueden alcanzar la semilla. Se reconocen por el dorso morado o violáceo de la larva. Los frutos atacados presentan deformaciones, maduración irregular y caída. Es una plaga de alto impacto cuarentenario que restringe el comercio internacional de fruta fresca.",
+    cultural: "Poda de aireación y eliminación de frutos dañados o caídos. Destrucción de residuos de cosecha. Monitoreo con trampas de feromona (cuando disponibles) para detectar vuelos de adultos. Evitar el movimiento de fruta infestada entre fincas o municipios.",
+    biologico: "Uso de Bacillus thuringiensis (Bt) en etapas tempranas de desarrollo larval. Hongos entomopatógenos (Beauveria) en aplicaciones dirigidas. Liberación o conservación de parasitoides nativos cuando existan protocolos regionales.",
+    quimico: "Insecticidas selectivos autorizados por el ICA, aplicados preferiblemente al inicio de las brotaciones y en periodos de mayor actividad de adultos. Seguir estrictamente las recomendaciones de rotación y dosis."
+  },
+  {
+    nombre: "Heilipus trifasciatus (Picudo del criollo)",
+    categoria: "Cuarentenaria",
+    color: "#dc2626",
+    variedades: ["criollo"],
+    sintomas: "Prefiere frutos de raza antillana (criollo). La larva se desarrolla preferentemente en la semilla, provocando su destrucción y la caída del fruto. Externamente se observan perforaciones y síntomas similares a otros picudos. Es de particular importancia en sistemas tradicionales y en material usado como patrón.",
+    cultural: "Recolección sistemática y destrucción de frutos infestados. Priorizar el monitoreo en plantaciones de criollo y en patrones antillanos. No utilizar semillas de frutos atacados para vivero.",
+    biologico: "Beauveria bassiana aplicada en focos. Mantener cobertura vegetal que favorezca depredadores y parasitoides.",
+    quimico: "Aplicaciones focalizadas solo con productos autorizados por el ICA y bajo criterio técnico, evitando tratamientos generalizados."
+  },
+  {
+    nombre: "Phytophthora cinnamomi Rands (Pudrición radical / tristeza del aguacate)",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Es la enfermedad más limitante del cultivo a nivel mundial. Produce pudrición de raíces absorbentes (color negro, corteza que se desprende fácilmente). En la parte aérea se observa marchitez progresiva, clorosis, reducción del tamaño foliar, defoliación y muerte de ramas. Los árboles afectados presentan copa rala y pueden morir en pocos meses si el drenaje es deficiente y no se interviene.",
+    cultural: "Establecer el cultivo en suelos bien drenados o con camas elevadas. Usar material de propagación certificado y patrones tolerantes/resistentes. Evitar encharcamientos y riego excesivo. Desinfección de herramientas. Eliminación de árboles muertos y solarización de sitios afectados cuando sea viable.",
+    biologico: "Incorporación de Trichoderma harzianum y materia orgánica compostada para favorecer microbiota antagonista. Uso de bioestimulantes que mejoren el sistema radical.",
+    quimico: "Fosetil-Al, fosfitos de potasio o productos autorizados por el ICA aplicados al suelo o vía foliar según ficha técnica. Combinar siempre con manejo cultural; el químico solo no resuelve el problema de drenaje."
+  },
+  {
+    nombre: "Colletotrichum gloeosporioides (Antracnosis)",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Lesiones negras, hundidas y circulares a irregulares sobre el fruto, especialmente visibles en poscosecha o en frutos maduros en el árbol. En hojas y ramas pueden aparecer manchas necróticas. El hongo penetra en campo pero se expresa con fuerza cuando el fruto madura. Reduce drásticamente la calidad comercial y la vida útil.",
+    cultural: "Poda de aireación para reducir humedad relativa en la copa. Cosecha en el punto de madurez adecuado. Manejo cuidadoso para evitar heridas. Eliminación de frutos momificados y residuos de cosecha. Buenas prácticas de higiene en empaque.",
+    biologico: "Aplicaciones de Trichoderma spp. y Bacillus subtilis como protectantes. Inductores de resistencia cuando estén validados localmente.",
+    quimico: "Fungicidas cúpricos y triazoles autorizados por el ICA, en programas preventivos durante floración y desarrollo del fruto, respetando intervalos y carencias."
+  },
+  {
+    nombre: "Sphaceloma perseae (Roña del aguacate)",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","papelillo"],
+    sintomas: "Lesiones corchosas, rugosas y de color café a grisáceo sobre la epidermis del fruto. En infecciones severas el fruto se deforma y pierde valor comercial. También puede afectar hojas jóvenes y tallos tiernos produciendo costras.",
+    cultural: "Poda de ramas afectadas y mejora de la aireación. Evitar el exceso de humedad foliar. Eliminación de fuentes de inóculo dentro de la plantación.",
+    biologico: "Manejo de humedad y uso de biofungicidas protectantes cuando estén disponibles y autorizados.",
+    quimico: "Fungicidas cúpricos preventivos autorizados por el ICA, aplicados en periodos de mayor susceptibilidad (brotación y cuaje)."
+  },
+  {
+    nombre: "Pseudocercospora purpurea (Mancha negra / Cercospora)",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Manchas circulares a irregulares de color púrpura a negro sobre hojas y frutos. En frutos las lesiones pueden ser superficiales o ligeramente hundidas y afectan la apariencia. En hojas severas provocan defoliación prematura.",
+    cultural: "Mejora de la aireación mediante poda. Evitar riego por aspersión en horarios que prolonguen la humedad foliar. Recolección de hojas y frutos muy afectados.",
+    biologico: "Biofungicidas y prácticas que reduzcan el inóculo residual.",
+    quimico: "Fungicidas protectantes autorizados por el ICA en programas preventivos según presión de la enfermedad."
+  },
+  {
+    nombre: "Monalonion velezangeli (Chinche del aguacate)",
+    categoria: "Importancia Económica",
+    color: "#dd6b20",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "El insecto succiona la savia de frutos jóvenes y brotes. Deja cicatrices, deformaciones y manchas corchosas en la epidermis. Los frutos afectados pierden calidad estética y comercial. En ataques intensos se observa caída de frutos pequeños.",
+    cultural: "Monitoreo visual frecuente de brotes y frutos jóvenes. Eliminación manual de focos cuando la población es baja. Evitar el exceso de brotaciones vegetativas que atraen al insecto.",
+    biologico: "Conservación de depredadores naturales. Uso de hongos entomopatógenos en focos concentrados cuando existan productos autorizados.",
+    quimico: "Insecticidas selectivos autorizados por el ICA, aplicados solo cuando el umbral de daño económico se supera y preferiblemente en horarios de menor actividad de polinizadores."
+  },
+  {
+    nombre: "Oligonychus yothersi (Arañita roja)",
+    categoria: "Importancia Económica",
+    color: "#dd6b20",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Ácaros de color rojizo que se alimentan del envés de las hojas. Provocan bronceado, plateado o amarillamiento del follaje, reducción de la capacidad fotosintética y, en infestaciones severas, defoliación. El estrés hídrico y las condiciones cálidas y secas favorecen su explosión poblacional.",
+    cultural: "Riego adecuado para evitar estrés hídrico. Monitoreo del envés foliar con lupa. Evitar el polvo excesivo en caminos internos que favorece a los ácaros.",
+    biologico: "Liberación o conservación de ácaros depredadores (Phytoseiidae). Hongos acaropatógenos cuando estén disponibles.",
+    quimico: "Acaricidas específicos autorizados por el ICA, rotando modos de acción. No usar insecticidas de amplio espectro que eliminen depredadores."
+  },
+  {
+    nombre: "Trips (Frankliniella spp. / Scirtothrips spp.)",
+    categoria: "Importancia Económica",
+    color: "#dd6b20",
+    variedades: ["papelillo","criollo","hass"],
+    sintomas: "Alimentación en frutos jóvenes produce cicatrices plateadas, rugosidades y deformaciones de la epidermis. En variedades de cáscara delgada (Papelillo) el daño estético es especialmente grave. También pueden afectar flores y reducir el cuaje.",
+    cultural: "Monitoreo con trampas azules o blancas. Manejo de malezas hospederas. Evitar exceso de nitrógeno que genera brotes tiernos atractivos.",
+    biologico: "Hongos entomopatógenos y depredadores generales (ácaros, chinches). Productos a base de Beauveria o Metarhizium cuando estén autorizados.",
+    quimico: "Insecticidas autorizados por el ICA aplicados en momentos de máxima vulnerabilidad (floración-cuaje), respetando polinizadores y períodos de carencia."
+  },
+  {
+    nombre: "Phytophthora palmivora (Pudrición del fruto / cancro)",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Pudrición blanda de frutos en el árbol o en poscosecha, frecuentemente iniciada desde el pedúnculo. También puede producir cancros en tallos y ramas con exudado. Favorecida por alta humedad y heridas.",
+    cultural: "Drenaje, poda de aireación, cosecha oportuna y manejo cuidadoso de frutos. Eliminación de frutos podridos.",
+    biologico: "Trichoderma y prácticas que reduzcan la humedad persistente en la copa.",
+    quimico: "Fungicidas autorizados por el ICA (fosfitos, cúpricos u otros según registro) en programas preventivos en zonas de alta presión."
+  },
+  {
+    nombre: "Botryosphaeria spp. (Cancro / muerte regresiva)",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Cancros en ramas y tronco, muerte regresiva de brotes, secado de ramas desde la punta hacia abajo. En cortes se observa decoloración interna de la madera. Asociado a estrés, heridas de poda y condiciones predisponentes.",
+    cultural: "Poda en época seca, desinfección de herramientas, pintura protectora en cortes grandes, eliminación de material enfermo y quema o retiro de la finca.",
+    biologico: "Fortalecimiento del árbol con nutrición equilibrada y riego adecuado. Biofungicidas en heridas cuando estén validados.",
+    quimico: "Fungicidas protectantes autorizados aplicados después de podas o en periodos de alto riesgo según criterio técnico."
+  },
+  {
+    nombre: "Fusarium spp. (Marchitez / pudrición de cuello)",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Marchitez unilateral o generalizada, clorosis, reducción de vigor y en algunos casos pudrición del cuello o raíces. Puede confundirse con Phytophthora; el diagnóstico de laboratorio es recomendable.",
+    cultural: "Material certificado, buen drenaje, evitar heridas en cuello y raíces, no sembrar en sitios con historial de marchiteces vasculares sin rehabilitación del suelo.",
+    biologico: "Trichoderma y enmiendas orgánicas que mejoren la estructura y microbiota del suelo.",
+    quimico: "Productos autorizados según diagnóstico confirmado; el manejo cultural es prioritario."
+  },
+  {
+    nombre: "Verticillium dahliae (Verticilosis)",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Marchitez de ramas o de todo el árbol, a menudo de un lado. En cortes transversales de ramas se observa oscurecimiento de los vasos. El hongo persiste en el suelo por años.",
+    cultural: "Evitar siembras en suelos con historial de verticilosis. Usar material sano. No trasladar suelo ni herramientas contaminadas. Eliminación de árboles muy afectados.",
+    biologico: "Solarización de suelos en vivero y prácticas de regeneración de microbiota.",
+    quimico: "Limitado; el control se basa principalmente en prevención y exclusión."
+  },
+  {
+    nombre: "Nectria / Fusarium solani (Cancro del tallo)",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Cancros con posible producción de estructuras fructíferas, debilidad estructural de ramas y entrada de otros patógenos. Asociado a heridas y estrés.",
+    cultural: "Poda sanitaria, desinfección de herramientas, protección de cortes y reducción de estrés hídrico y nutricional.",
+    biologico: "Mismo enfoque de fortalecimiento del árbol y microbiota benéfica.",
+    quimico: "Fungicidas protectantes autorizados en heridas grandes según criterio técnico."
+  },
+  {
+    nombre: "Xyleborus / barrenadores de madera",
+    categoria: "Importancia Económica",
+    color: "#dd6b20",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Orificios en ramas y tronco con salida de aserrín fino. Debilitamiento de ramas, entrada de hongos secundarios y, en casos severos, muerte de sectores de la copa. Frecuente en árboles estresados.",
+    cultural: "Mantener vigor del árbol (riego, nutrición, control de otras plagas). Eliminación y destrucción de material infestado. Evitar heridas innecesarias.",
+    biologico: "Hongos entomopatógenos en focos. Conservación de enemigos naturales.",
+    quimico: "Insecticidas sistémicos o de contacto autorizados por el ICA solo en focos confirmados y bajo asistencia técnica."
+  },
+  {
+    nombre: "Parasitosis de semilla y pudriciones de vivero",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "En semilleros y viveros: pudrición de semillas, damping-off, plántulas con cuello necrosado y muerte temprana. Asociado a exceso de humedad, sustratos contaminados y falta de higiene.",
+    cultural: "Sustratos esterilizados o tratados, riego controlado, bandejas y herramientas desinfectadas, material semilla sano y de origen conocido.",
+    biologico: "Trichoderma en sustrato y tratamientos de semilla con bioinsumos autorizados.",
+    quimico: "Fungicidas de suelo o de semilla autorizados según registro ICA y solo cuando sea necesario."
+  },
+  {
+    nombre: "Daño por heladas / estrés abiótico (diagnóstico diferencial)",
+    categoria: "Importancia Económica",
+    color: "#718096",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Quemaduras en tejidos tiernos, necrosis de bordes foliares, caída de flores o frutos jóvenes tras eventos de temperatura extrema o estrés hídrico severo. No es un patógeno, pero se confunde fácilmente con enfermedades.",
+    cultural: "Selección de sitios con menor riesgo de heladas, cortinas rompevientos, riego de protección cuando sea viable y variedades adaptadas a la zona.",
+    biologico: "No aplica (factor abiótico).",
+    quimico: "No aplica. El manejo es preventivo y de recuperación del árbol (nutrición y riego)."
+  },
+  {
+    nombre: "Virus y viroides (vigilancia)",
+    categoria: "Cuarentenaria",
+    color: "#dc2626",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Síntomas variables: moteados, deformaciones foliares, enanismo o reducción de vigor. En Colombia la vigilancia es prioritaria; cualquier sospecha debe reportarse al ICA. No existe control curativo una vez el árbol está infectado.",
+    cultural: "Uso exclusivo de material de propagación certificado y proveniente de fuentes autorizadas. Eliminación de plantas sospechosas bajo indicación del ICA. No injertar material de origen desconocido.",
+    biologico: "No aplica control biológico curativo.",
+    quimico: "No aplica. La estrategia es exclusión y material sano."
+  },
+  {
+    nombre: "Complejo de pudriciones poscosecha",
+    categoria: "Fitopatología",
+    color: "#7c3aed",
+    variedades: ["hass","criollo","papelillo"],
+    sintomas: "Pudriciones que se expresan durante almacenamiento, transporte o comercialización (antracnosis, stem-end rot y otros). Reducen la vida útil y generan rechazos en mercado.",
+    cultural: "Cosecha en madurez fisiológica adecuada, manejo cuidadoso (evitar golpes), preenfriamiento, cadena de frío y buenas prácticas de higiene en empaque.",
+    biologico: "Biofungicidas poscosecha autorizados cuando existan.",
+    quimico: "Tratamientos poscosecha solo con productos registrados para ese uso y mercados destino."
+  }
+];
+
+const HISTORIAS = {
+  hass: {
+    titulo: "Aguacate cv. Hass",
+    subtitulo: "El cultivar de exportación más importante del mundo",
+    origen: "Originado en La Habra Heights, California (1926) a partir de una semilla plantada por Rudolph Hass. La patente se otorgó en 1935. Hoy representa la mayor parte del comercio mundial de aguacate fresco.",
+    historia: "En Colombia lidera las exportaciones. Las zonas de mayor desarrollo son Antioquia, Caldas, Risaralda, Quindío, Tolima, Valle del Cauca y el Eje Cafetero. Su adaptación a altitudes medias y su calidad de pulpa lo convirtieron en el estándar de la industria.",
+    rasgos: "Fruto ovoide a piriforme, peso habitual entre 150 y 400 g. Cáscara gruesa, rugosa y de color verde que se torna morado-negro al madurar. Alto contenido de aceite (18-22 %). Semilla de tamaño medio. Excelente comportamiento en poscosecha y transporte.",
+    susceptibilidad: "Sensible a Heilipus lauri, Stenoma catenifer, Phytophthora cinnamomi, Monalonion velezangeli y arañita roja (Oligonychus yothersi). Requiere monitoreo permanente de plagas cuarentenarias para mantener acceso a mercados de exportación.",
+    usos: "Exportación en fresco, guacamole, industria de aceite y mercado interno de alta calidad.",
+    manejo: "Uso de patrones tolerantes a Phytophthora, podas de formación y producción, nutrición equilibrada, monitoreo de plagas cuarentenarias y cumplimiento de protocolos de inocuidad y trazabilidad exigidos por los mercados destino."
+  },
+  criollo: {
+    titulo: "Aguacate Criollo (Raza Antillana)",
+    subtitulo: "Patrimonio genético y patrón tradicional de Colombia",
+    origen: "Nativo de tierras bajas tropicales de Centroamérica y el norte de Sudamérica. Formó la base del consumo interno colombiano durante décadas antes de la expansión del Hass.",
+    historia: "Amplia distribución en huertos familiares y sistemas tradicionales. Se utiliza extensamente como patrón por su vigor y adaptación a condiciones locales, aunque es susceptible a ciertos picudos.",
+    rasgos: "Fruto grande (frecuentemente 300 g a más de 1 kg). Cáscara lisa y relativamente delgada, de color verde claro a medio. Semilla grande en proporción al fruto. Pulpa de sabor suave y menor contenido de aceite que Hass.",
+    susceptibilidad: "Hospedador preferencial de Heilipus trifasciatus (picudo del criollo). También afectado por trips, Monalonion y enfermedades de raíz en suelos mal drenados.",
+    usos: "Consumo fresco nacional, jugos, y como patrón para injertar Hass, Papelillo y otros cultivares comerciales.",
+    manejo: "Control prioritario del picudo del criollo, podas de aclareo, selección de semilla sana para vivero y manejo de drenaje cuando se usa como patrón."
+  },
+  papelillo: {
+    titulo: "Aguacate Papelillo (cv. Lorena y afines)",
+    subtitulo: "La variedad insignia del consumo nacional",
+    origen: "Selecciones desarrolladas y popularizadas en Colombia. Muy apreciada en el mercado interno por su sabor y rendimiento de pulpa.",
+    historia: "Ocupa un lugar central en la preferencia del consumidor colombiano. Se cultiva en diversas altitudes y sistemas, desde huertos familiares hasta plantaciones comerciales orientadas al mercado fresco nacional.",
+    rasgos: "Fruto alargado a piriforme, peso habitual entre 400 y 900 g. Cáscara muy fina, lisa y brillante de color verde. Alto rendimiento de pulpa y textura cremosa. Menor vida poscosecha que Hass por la delgadez de la cáscara.",
+    susceptibilidad: "Muy sensible a trips y Monalonion por su cáscara delgada. También susceptible a antracnosis y daños mecánicos que facilitan entrada de patógenos.",
+    usos: "Principalmente mercado fresco nacional. Menor presencia en exportación de larga distancia por características de cáscara y poscosecha.",
+    manejo: "Control temprano de trips y chinches, manejo cuidadoso en cosecha y poscosecha, evitar heridas mecánicas y programas preventivos de antracnosis."
+  }
+};
+
+let imagenActual = null;
+let gpsData = null;
+let ultimoResultado = null;
+let pendingFeatures = null;
+let pendingClasif = null;
+let filtroGaleria = 'todos';
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').classList.add('show');
+});
+
+function instalarApp() {
+  if (!deferredPrompt) {
+    alert('En este navegador usa el menú del navegador → «Instalar aplicación» o «Añadir a pantalla de inicio».');
+    return;
+  }
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('install-banner').classList.remove('show');
+  });
+}
+
+function compartirApp() {
+  const url = window.location.href;
+  const texto = encodeURIComponent('Fitopatologías Aguacate – Sistema de diagnóstico fitosanitario (clasificación automática de variedad). Ábrelo o instálalo como app:\n' + url);
+  window.open('https://wa.me/?text=' + texto, '_blank');
+}
+
+function mostrarPagina(nombre, boton) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + nombre).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  if (boton) boton.classList.add('active');
+  if (nombre === 'galeria') cargarGaleria();
+  if (nombre === 'catalogo') cargarCatalogo();
+}
+
+function cargarImagen(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    imagenActual = ev.target.result;
+    const preview = document.getElementById('preview');
+    preview.src = imagenActual;
+    preview.classList.add('show');
+    document.getElementById('btn-analizar').disabled = false;
+    document.getElementById('btn-analizar').style.opacity = '1';
+    document.getElementById('resultado-analisis').classList.remove('show');
+    document.getElementById('resultado-analisis').innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function obtenerGPS() {
+  const txt = document.getElementById('gps-text');
+  txt.innerHTML = '⏳ Solicitando permiso y obteniendo ubicación de alta precisión...';
+  txt.style.color = 'var(--accent)';
+  if (!navigator.geolocation) {
+    txt.innerHTML = '❌ Este dispositivo o navegador no soporta geolocalización.';
+    txt.style.color = 'var(--danger)';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      gpsData = {
+        lat: pos.coords.latitude.toFixed(6),
+        lon: pos.coords.longitude.toFixed(6),
+        accuracy: Math.round(pos.coords.accuracy),
+        timestamp: new Date().toLocaleString('es-CO')
+      };
+      txt.innerHTML = '📍 Lat ' + gpsData.lat + ', Lon ' + gpsData.lon + '<br><small>Precisión ±' + gpsData.accuracy + ' m • ' + gpsData.timestamp + '</small>';
+      txt.style.color = 'var(--success)';
+    },
+    function(err) {
+      let msg = 'No se pudo obtener la ubicación. ';
+      if (err.code === 1) msg += 'Permiso denegado. Activa el GPS y autoriza la ubicación en el navegador.';
+      else if (err.code === 2) msg += 'Posición no disponible.';
+      else if (err.code === 3) msg += 'Tiempo de espera agotado.';
+      txt.innerHTML = '❌ ' + msg;
+      txt.style.color = 'var(--danger)';
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+function extraerFeatures(img) {
+  const canvas = document.createElement('canvas');
+  const maxSide = 240;
+  const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+  canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+  canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const w = canvas.width, h = canvas.height;
+  const data = ctx.getImageData(0, 0, w, h).data;
+
+  // Centro de la imagen (donde suele estar el fruto)
+  const x0 = Math.floor(w * 0.15), x1 = Math.floor(w * 0.85);
+  const y0 = Math.floor(h * 0.15), y1 = Math.floor(h * 0.85);
+
+  let n = 0;
+  let sumR = 0, sumG = 0, sumB = 0, sumL = 0;
+  let sumSat = 0, sumHueG = 0;
+  let nGreenHue = 0, nDark = 0, nBright = 0;
+  const luminancias = [];
+
+  for (let y = y0; y < y1; y += 1) {
+    for (let x = x0; x < x1; x += 1) {
+      const idx = (y * w + x) * 4;
+      const r = data[idx] / 255, g = data[idx+1] / 255, b = data[idx+2] / 255, a = data[idx+3];
+      if (a < 128) continue;
+
+      // Descartar fondos muy blancos o muy negros
+      const maxc = Math.max(r, g, b);
+      const minc = Math.min(r, g, b);
+      const l = (maxc + minc) / 2;
+      if (l > 0.97 || l < 0.04) continue;
+
+      const delta = maxc - minc;
+      let h = 0;
+      if (delta > 0.001) {
+        if (maxc === g) h = 60 * (((b - r) / delta) + 2);
+        else if (maxc === r) h = 60 * (((g - b) / delta) % 6);
+        else h = 60 * (((r - g) / delta) + 4);
+        if (h < 0) h += 360;
+      }
+      const s = delta / (1 - Math.abs(2 * l - 1) + 0.001);
+
+      // Solo considerar píxeles con algo de color (evitar grises de sombra pura)
+      if (s < 0.08 && l > 0.25 && l < 0.85) continue;
+
+      sumR += r; sumG += g; sumB += b; sumL += l; sumSat += s;
+      luminancias.push(l);
+      n++;
+
+      // Tono verde-amarillo típico de cáscara de aguacate (aprox 50°–160°)
+      if (h >= 45 && h <= 165 && s > 0.12) {
+        nGreenHue++;
+        sumHueG += h;
+      }
+      if (l < 0.28) nDark++;
+      if (l > 0.55) nBright++;
+    }
+  }
+
+  if (n < 50) {
+    // Fallback muestreo completo
+    for (let i = 0; i < data.length; i += 16) {
+      const r = data[i] / 255, g = data[i+1] / 255, b = data[i+2] / 255, a = data[i+3];
+      if (a < 128) continue;
+      const maxc = Math.max(r, g, b), minc = Math.min(r, g, b);
+      const l = (maxc + minc) / 2;
+      if (l > 0.97 || l < 0.04) continue;
+      sumR += r; sumG += g; sumB += b; sumL += l;
+      luminancias.push(l);
+      n++;
+      const delta = maxc - minc;
+      const s = delta / (1 - Math.abs(2 * l - 1) + 0.001);
+      sumSat += s;
+      let h = 0;
+      if (delta > 0.001) {
+        if (maxc === g) h = 60 * (((b - r) / delta) + 2);
+        else if (maxc === r) h = 60 * (((g - b) / delta) % 6);
+        else h = 60 * (((r - g) / delta) + 4);
+        if (h < 0) h += 360;
+      }
+      if (h >= 45 && h <= 165 && s > 0.12) nGreenHue++;
+      if (l < 0.28) nDark++;
+      if (l > 0.55) nBright++;
+    }
+  }
+  if (n < 1) n = 1;
+
+  const avgR = (sumR / n) * 255;
+  const avgG = (sumG / n) * 255;
+  const avgB = (sumB / n) * 255;
+  const avgL = sumL / n;
+  const avgSat = sumSat / n;
+  const avgBrillo = (avgR + avgG + avgB) / 3;
+
+  let varianza = 0;
+  for (const l of luminancias) varianza += (l - avgL) * (l - avgL);
+  const textura = Math.sqrt(varianza / n) * 255; // escala similar a antes
+
+  const oscuridad = 1 - avgL;
+  const verdor = avgG / (avgR + avgG + avgB + 0.001);
+  const rojez = avgR / (avgR + avgG + avgB + 0.001);
+  const propVerde = nGreenHue / n;   // proporción de píxeles con tono verde
+  const propOscuro = nDark / n;
+  const propClaro = nBright / n;
+
+  return {
+    avgBrillo, textura, oscuridad, verdor, rojez,
+    avgR, avgG, avgB, n,
+    avgL, avgSat, propVerde, propOscuro, propClaro
+  };
+}
+
+function clasificarVariedad(features) {
+  const V = features.verdor;
+  const O = features.oscuridad;
+  const B = features.avgBrillo;
+  const σ = features.textura;
+  const PV = features.propVerde || 0;   // 0..1 píxeles verdes
+  const PO = features.propOscuro || 0;
+  const PC = features.propClaro || 0;
+  const sat = features.avgSat || 0;
+
+  const puntos = { hass: 0, criollo: 0, papelillo: 0 };
+
+  // ========== SEÑALES CLARAS ==========
+  // Fruto VERDE de verdad (cáscara verde de Criollo/Papelillo o Hass inmaduro)
+  const fuerteVerde = PV >= 0.28 || (V >= 0.36 && PV >= 0.15);
+  const algoVerde = PV >= 0.16 || V >= 0.33;
+  // Fruto OSCURO (Hass maduro típico)
+  const fuerteOscuro = O >= 0.55 || PO >= 0.35 || B < 85;
+  const algoOscuro = O >= 0.45 || PO >= 0.22 || B < 105;
+  // Cáscara lisa / brillante vs rugosa
+  const liso = σ < 30;
+  const rugoso = σ >= 40;
+  const brillante = B >= 130 || PC >= 0.30;
+
+  // ----- RAMA 1: Claramente oscuro → Hass -----
+  if (fuerteOscuro && !fuerteVerde) {
+    puntos.hass += 20;
+    puntos.criollo += 1;
+    puntos.papelillo += 0;
+    if (rugoso) puntos.hass += 4;
+  }
+  // ----- RAMA 2: Claramente verde y no oscuro → Criollo o Papelillo -----
+  else if (fuerteVerde && !fuerteOscuro) {
+    puntos.hass += 0;
+    puntos.criollo += 10;
+    puntos.papelillo += 10;
+    // Papelillo: más brillante, más liso, más claro
+    if (brillante || liso || B >= 120) {
+      puntos.papelillo += 8;
+      puntos.criollo += 3;
+    } else {
+      puntos.criollo += 7;
+      puntos.papelillo += 3;
+    }
+    // Saturación alta de verde favorece ambos, un poco más Papelillo si brilla
+    if (sat > 0.25 && brillante) puntos.papelillo += 3;
+  }
+  // ----- RAMA 3: Algo verde -----
+  else if (algoVerde && !fuerteOscuro) {
+    puntos.criollo += 8;
+    puntos.papelillo += 7;
+    puntos.hass += 2;
+    if (brillante || liso) puntos.papelillo += 5;
+    if (!liso) puntos.criollo += 4;
+    if (algoOscuro) puntos.hass += 3;
+  }
+  // ----- RAMA 4: Algo oscuro -----
+  else if (algoOscuro) {
+    puntos.hass += 12;
+    puntos.criollo += 3;
+    puntos.papelillo += 1;
+    if (rugoso) puntos.hass += 4;
+    if (algoVerde) { puntos.criollo += 3; puntos.hass -= 2; }
+  }
+  // ----- RAMA 5: Intermedio / dudoso -----
+  else {
+    puntos.criollo += 6;
+    puntos.papelillo += 5;
+    puntos.hass += 5;
+    if (rugoso) puntos.hass += 4;
+    if (liso) { puntos.papelillo += 4; puntos.criollo += 3; }
+    if (brillante) puntos.papelillo += 3;
+    if (PV > 0.12) { puntos.criollo += 3; puntos.papelillo += 2; puntos.hass -= 2; }
+  }
+
+  // Seguridad anti-Hass en verdes
+  if (fuerteVerde) {
+    puntos.hass = Math.min(puntos.hass, 3);
+  }
+  if (fuerteVerde && !algoOscuro) {
+    puntos.hass = 0;
+  }
+
+  puntos.hass = Math.max(0, Math.round(puntos.hass));
+  puntos.criollo = Math.max(0, Math.round(puntos.criollo));
+  puntos.papelillo = Math.max(0, Math.round(puntos.papelillo));
+
+  let varKey = 'hass';
+  let maxP = puntos.hass;
+  if (puntos.criollo > maxP) { maxP = puntos.criollo; varKey = 'criollo'; }
+  if (puntos.papelillo > maxP) { maxP = puntos.papelillo; varKey = 'papelillo'; }
+
+  // Desempate Criollo vs Papelillo
+  if (varKey !== 'hass' && Math.abs(puntos.criollo - puntos.papelillo) <= 2) {
+    varKey = (brillante || liso || B >= 125) ? 'papelillo' : 'criollo';
+    maxP = puntos[varKey];
+  }
+
+  const vals = [puntos.hass, puntos.criollo, puntos.papelillo].sort((a,b)=>b-a);
+  const margen = vals[0] - vals[1];
+  const total = puntos.hass + puntos.criollo + puntos.papelillo || 1;
+  let confianza = Math.round(58 + (maxP / total) * 28 + Math.min(margen, 12));
+  confianza = Math.max(55, Math.min(94, confianza));
+
+  return { varKey, confianza, puntos, features };
+}
+
+
+function mostrarResultadoDiagnostico(varKey, confianza, puntos, features, forzado) {
+  const nombres = { hass: 'Hass', criollo: 'Criollo (Antillano)', papelillo: 'Papelillo (Lorena)' };
+  const diag = seleccionarPatologia(varKey, features);
+  const principal = diag.principal;
+  const otras = diag.otras || [];
+  const panel = document.getElementById('resultado-analisis');
+
+  ultimoResultado = {
+    variedad: varKey,
+    nombreVariedad: nombres[varKey],
+    confianza: confianza,
+    puntos: puntos || { hass:0, criollo:0, papelillo:0 },
+    features: features,
+    plagas: principal ? [principal].concat(otras) : [],
+    patologiaPrincipal: principal ? principal.nombre : '—',
+    notas: document.getElementById('notas').value.trim(),
+    gps: gpsData ? Object.assign({}, gpsData) : null,
+    fecha: new Date().toISOString(),
+    imagen: imagenActual
+  };
+
+  actualizarHistoria(varKey);
+
+  let html = '';
+  html += '<h3>✅ Variedad ' + (forzado ? 'confirmada' : 'sugerida') + '</h3>';
+  html += '<span class="badge ' + varKey + '">' + nombres[varKey] + '</span>';
+  html += '<span class="badge">Confianza ' + confianza + '%</span>';
+  html += '<div class="confidence-bar"><div class="confidence-fill" style="width:' + confianza + '%"></div></div>';
+
+  const PV = ((features.propVerde || 0) * 100).toFixed(0);
+  html += '<p style="font-size:0.8rem;margin-bottom:8px;color:var(--muted)">Escaneo: brillo ' + features.avgBrillo.toFixed(0) + ' · textura ' + features.textura.toFixed(1) + ' · oscuridad ' + (features.oscuridad*100).toFixed(0) + '% · verdor ' + (features.verdor*100).toFixed(0) + '% · píxeles verdes ' + PV + '%</p>';
+
+  if (puntos) {
+    html += '<p style="font-size:0.8rem;margin-bottom:10px"><strong>Puntuación:</strong> Hass ' + puntos.hass + ' · Criollo ' + puntos.criollo + ' · Papelillo ' + puntos.papelillo + '</p>';
+  }
+
+  // Botones para corregir variedad
+  html += '<div style="background:#eef6f1;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px">';
+  html += '<div style="font-size:0.8rem;font-weight:700;color:var(--primary);margin-bottom:8px">¿La variedad es correcta? Si no, elige la correcta:</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
+  html += '<button class="btn btn-sm" style="background:' + (varKey==='hass'?'#1a365d':'#4a5568') + '" onclick="confirmarVariedad(\'hass\')">Hass</button>';
+  html += '<button class="btn btn-sm" style="background:' + (varKey==='criollo'?'#276749':'#4a5568') + '" onclick="confirmarVariedad(\'criollo\')">Criollo</button>';
+  html += '<button class="btn btn-sm" style="background:' + (varKey==='papelillo'?'#744210':'#4a5568') + '" onclick="confirmarVariedad(\'papelillo\')">Papelillo</button>';
+  html += '</div></div>';
+
+  if (principal) {
+    html += '<div style="background:#fff;border:2px solid ' + principal.color + ';border-radius:14px;padding:14px;margin:12px 0">';
+    html += '<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:' + principal.color + ';margin-bottom:4px">Patología más probable para ' + nombres[varKey] + '</div>';
+    html += '<div style="font-weight:800;font-size:0.95rem;margin-bottom:4px">' + principal.nombre + '</div>';
+    html += '<span class="badge" style="background:' + principal.color + '">' + principal.categoria + '</span>';
+    html += '<div style="margin-top:10px;font-size:0.84rem;line-height:1.45"><strong>Síntomas:</strong> ' + principal.sintomas + '</div>';
+    html += '<div style="margin-top:8px;font-size:0.84rem;line-height:1.45"><strong>Manejo cultural:</strong> ' + principal.cultural + '</div>';
+    html += '<div style="margin-top:8px;font-size:0.84rem;line-height:1.45"><strong>Control biológico:</strong> ' + principal.biologico + '</div>';
+    html += '<div style="margin-top:8px;font-size:0.84rem;line-height:1.45"><strong>Control químico:</strong> ' + principal.quimico + '</div>';
+    html += '</div>';
+  }
+
+  if (otras.length) {
+    html += '<h4 style="color:var(--primary);margin:14px 0 8px;font-size:0.9rem">Otras patologías relevantes en ' + nombres[varKey] + '</h4>';
+    otras.forEach((p, i) => {
+      html += '<div style="background:#fafcfa;border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px">';
+      html += '<div style="font-weight:700;font-size:0.84rem;color:' + p.color + '">' + (i+2) + '. ' + p.nombre + '</div>';
+      html += '<div style="font-size:0.7rem;color:var(--muted);margin:2px 0 4px">' + p.categoria + '</div>';
+      html += '<div style="font-size:0.78rem;line-height:1.4">' + p.sintomas.substring(0, 160) + '...</div>';
+      html += '</div>';
+    });
+  }
+
+  html += '<div style="margin-top:14px"><button class="btn btn-primary" onclick="guardarDiagnostico()">💾 Guardar este diagnóstico en el dispositivo</button></div>';
+  html += '<div class="analysis-warning"><strong>Alcance:</strong> El escaneo estima variedad por color (tono verde), brillo y textura del centro de la foto. Si la sugerencia falla, usa los botones para indicar la variedad correcta: la patología se recalcula solo con plagas de esa variedad. No sustituye diagnóstico de laboratorio ni al ICA.</div>';
+  panel.innerHTML = html;
+  panel.classList.add('show');
+}
+
+function confirmarVariedad(varKey) {
+  if (!pendingFeatures) {
+    alert('Primero realiza un análisis de una fotografía.');
+    return;
+  }
+  // Confianza alta si el usuario confirma manualmente
+  const confianza = 90;
+  const puntos = pendingClasif ? pendingClasif.puntos : { hass:0, criollo:0, papelillo:0 };
+  mostrarResultadoDiagnostico(varKey, confianza, puntos, pendingFeatures, true);
+}
+
+// Selecciona patología coherente según variedad + características de la imagen
+function seleccionarPatologia(varKey, features) {
+  // Solo plagas de ESTA variedad
+  const candidatas = PLAGAS.filter(p => p.variedades.includes(varKey));
+  if (!candidatas.length) return { principal: null, otras: [] };
+
+  const σ = features.textura;
+  const O = features.oscuridad;
+  const V = features.verdor;
+  const B = features.avgBrillo;
+
+  // Puntuación de cada plaga según señales de la foto + prioridad por variedad
+  const scores = candidatas.map(p => {
+    let s = 0;
+    const nom = p.nombre.toLowerCase();
+
+    // Base por categoría (cuarentenarias importan más en vigilancia)
+    if (p.categoria === 'Cuarentenaria') s += 3;
+    else if (p.categoria === 'Fitopatología') s += 2;
+    else s += 1;
+
+    // Señales de imagen orientativas (no diagnósticas de laboratorio)
+    // Manchas oscuras / lesiones → antracnosis, mancha negra, roña
+    if (O > 0.45 && σ > 30) {
+      if (nom.includes('antracnosis') || nom.includes('colletotrichum')) s += 5;
+      if (nom.includes('mancha negra') || nom.includes('pseudocercospora')) s += 4;
+      if (nom.includes('roña') || nom.includes('sphaceloma')) s += 4;
+    }
+    // Textura irregular / costras
+    if (σ > 38) {
+      if (nom.includes('roña') || nom.includes('sphaceloma')) s += 3;
+      if (nom.includes('trips')) s += 2;
+      if (nom.includes('monalonion') || nom.includes('chinche')) s += 2;
+    }
+    // Fruto muy oscuro / maduro → mayor riesgo poscosecha y picudos en campo
+    if (O > 0.52) {
+      if (nom.includes('heilipus lauri') || nom.includes('picudo grande')) s += 3;
+      if (nom.includes('stenoma') || nom.includes('polilla')) s += 2;
+      if (nom.includes('poscosecha')) s += 2;
+    }
+    // Verde claro / cáscara fina (Papelillo) → trips y chinche
+    if (V > 0.36 && O < 0.42) {
+      if (nom.includes('trips')) s += 4;
+      if (nom.includes('monalonion') || nom.includes('chinche')) s += 3;
+      if (nom.includes('antracnosis')) s += 2;
+    }
+
+    // Prioridades por variedad (susceptibilidad conocida)
+    if (varKey === 'hass') {
+      if (nom.includes('heilipus lauri')) s += 4;
+      if (nom.includes('stenoma')) s += 3;
+      if (nom.includes('phytophthora cinnamomi')) s += 3;
+      if (nom.includes('oligonychus') || nom.includes('arañita')) s += 2;
+      if (nom.includes('antracnosis')) s += 2;
+    } else if (varKey === 'criollo') {
+      if (nom.includes('heilipus trifasciatus') || nom.includes('picudo del criollo')) s += 6;
+      if (nom.includes('trips')) s += 3;
+      if (nom.includes('monalonion')) s += 2;
+      if (nom.includes('phytophthora cinnamomi')) s += 2;
+    } else if (varKey === 'papelillo') {
+      if (nom.includes('trips')) s += 5;
+      if (nom.includes('monalonion') || nom.includes('chinche')) s += 4;
+      if (nom.includes('antracnosis')) s += 3;
+      if (nom.includes('roña')) s += 2;
+    }
+
+    return { plaga: p, score: s };
+  });
+
+  scores.sort((a, b) => b.score - a.score);
+  const principal = scores[0] ? scores[0].plaga : candidatas[0];
+  const otras = scores.slice(1, 4).map(x => x.plaga);
+
+  return { principal, otras, scores };
+}
+
+function ejecutarDiagnostico() {
+  if (!imagenActual) {
+    alert('Primero toma o selecciona una fotografía del aguacate.');
+    return;
+  }
+  const panel = document.getElementById('resultado-analisis');
+  panel.classList.add('show');
+  panel.innerHTML = '<p style="font-weight:700;color:var(--primary)">🔬 Analizando fotografía...</p><div class="progress-steps" id="progress-steps"><div class="step active"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div></div><p style="font-size:0.82rem;color:var(--muted)">Extrayendo brillo, textura, oscuridad y verdor · Clasificando variedad · Identificando patología coherente</p>';
+
+  const pasos = document.querySelectorAll('#progress-steps .step');
+  let paso = 0;
+  const timer = setInterval(() => {
+    if (paso < pasos.length) {
+      pasos[paso].classList.remove('active');
+      pasos[paso].classList.add('done');
+      paso++;
+      if (paso < pasos.length) pasos[paso].classList.add('active');
+    }
+  }, 280);
+
+  const img = new Image();
+  img.onload = function() {
+    try {
+      const features = extraerFeatures(img);
+      const clasif = clasificarVariedad(features);
+      clearInterval(timer);
+      pasos.forEach(s => { s.classList.add('done'); s.classList.remove('active'); });
+
+      const nombres = { hass: 'Hass', criollo: 'Criollo (Antillano)', papelillo: 'Papelillo (Lorena)' };
+      pendingFeatures = features;
+      pendingClasif = clasif;
+
+      // Mostrar resultado con opción de corregir variedad
+      mostrarResultadoDiagnostico(clasif.varKey, clasif.confianza, clasif.puntos, features, false);
+    } catch (err) {
+
+      clearInterval(timer);
+      console.error(err);
+      panel.innerHTML = '<p style="color:var(--danger)">No fue posible analizar esta imagen. Intenta con una fotografía JPG o PNG nítida y enfocada.</p>';
+      ultimoResultado = null;
+    }
+  };
+  img.onerror = function() {
+    clearInterval(timer);
+    panel.innerHTML = '<p style="color:var(--danger)">No se pudo leer la fotografía seleccionada.</p>';
+  };
+  img.src = imagenActual;
+}
+
+function actualizarHistoria(key) {
+  const h = HISTORIAS[key];
+  if (!h) return;
+  const cont = document.getElementById('contenido-historia');
+  cont.innerHTML = '<div style="margin-bottom:8px"><span class="badge ' + key + '">' + h.titulo + '</span></div>' +
+    '<p style="font-size:0.88rem;color:var(--muted);margin-bottom:14px;font-style:italic">' + h.subtitulo + '</p>' +
+    '<div class="historia-block"><h4>Origen</h4><p>' + h.origen + '</p></div>' +
+    '<div class="historia-block"><h4>Historia en Colombia</h4><p>' + h.historia + '</p></div>' +
+    '<div class="historia-block"><h4>Rasgos del fruto</h4><p>' + h.rasgos + '</p></div>' +
+    '<div class="historia-block"><h4>Susceptibilidad fitosanitaria</h4><p>' + h.susceptibilidad + '</p></div>' +
+    '<div class="historia-block"><h4>Usos principales</h4><p>' + h.usos + '</p></div>' +
+    '<div class="historia-block"><h4>Manejo general recomendado</h4><p>' + h.manejo + '</p></div>';
+}
+
+function obtenerDiagnosticos() {
+  try { return JSON.parse(localStorage.getItem('diagnosticos_aguacate') || '[]'); }
+  catch (e) { return []; }
+}
+
+function guardarDiagnostico() {
+  if (!ultimoResultado) {
+    alert('Primero realiza un análisis.');
+    return;
+  }
+  const lista = obtenerDiagnosticos();
+  const reg = {
+    id: Date.now(),
+    variedad: ultimoResultado.variedad,
+    nombreVariedad: ultimoResultado.nombreVariedad,
+    confianza: ultimoResultado.confianza,
+    notas: ultimoResultado.notas,
+    gps: ultimoResultado.gps,
+    fecha: ultimoResultado.fecha,
+    imagen: ultimoResultado.imagen,
+    plagaPrincipal: ultimoResultado.plagas[0] ? ultimoResultado.plagas[0].nombre : '—'
+  };
+  lista.unshift(reg);
+  while (lista.length > 40) lista.pop();
+  try {
+    localStorage.setItem('diagnosticos_aguacate', JSON.stringify(lista));
+    alert('✅ Diagnóstico guardado en este dispositivo.');
+    cargarGaleria();
+  } catch (e) {
+    reg.imagen = null;
+    lista[0] = reg;
+    try {
+      localStorage.setItem('diagnosticos_aguacate', JSON.stringify(lista));
+      alert('✅ Diagnóstico guardado (sin imagen por límite de almacenamiento).');
+    } catch (e2) {
+      alert('No se pudo guardar. Espacio de almacenamiento insuficiente.');
+    }
+  }
+}
+
+function cargarGaleria() {
+  const lista = obtenerDiagnosticos();
+  const cont = document.getElementById('galeria-contenido');
+  const stats = document.getElementById('stats-row');
+  const hass = lista.filter(d => d.variedad === 'hass').length;
+  const criollo = lista.filter(d => d.variedad === 'criollo').length;
+  const papelillo = lista.filter(d => d.variedad === 'papelillo').length;
+  stats.innerHTML = '<div class="stat-box"><div class="num">' + hass + '</div><div class="lbl">Hass</div></div>' +
+    '<div class="stat-box"><div class="num">' + criollo + '</div><div class="lbl">Criollo</div></div>' +
+    '<div class="stat-box"><div class="num">' + papelillo + '</div><div class="lbl">Papelillo</div></div>';
+  const filtrada = filtroGaleria === 'todos' ? lista : lista.filter(d => d.variedad === filtroGaleria);
+  if (!filtrada.length) {
+    cont.innerHTML = '<div class="empty-state"><span>🖼️</span><p>No hay diagnósticos guardados' + (filtroGaleria !== 'todos' ? ' para esta variedad' : '') + '. Realiza un análisis y guárdalo.</p></div>';
+    return;
+  }
+  cont.innerHTML = filtrada.map(d => {
+    const fecha = new Date(d.fecha).toLocaleString('es-CO');
+    const imgHtml = d.imagen ? '<img src="' + d.imagen + '" alt="diag">' : '<div style="width:72px;height:72px;background:#e8f0eb;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🥑</div>';
+    return '<div class="gallery-item" onclick="verDetalle(' + d.id + ')">' + imgHtml +
+      '<div class="meta"><strong>' + d.nombreVariedad + ' · ' + d.confianza + '%</strong>' +
+      '<span>' + fecha + '</span>' +
+      '<span>' + (d.plagaPrincipal || '').substring(0, 42) + '...</span>' +
+      (d.gps ? '<span>📍 ' + d.gps.lat + ', ' + d.gps.lon + '</span>' : '') +
+      '</div></div>';
+  }).join('');
+}
+
+function filtrarGaleria(tipo, boton) {
+  filtroGaleria = tipo;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  boton.classList.add('active');
+  cargarGaleria();
+}
+
+function verDetalle(id) {
+  const d = obtenerDiagnosticos().find(x => x.id === id);
+  if (!d) return;
+  const fecha = new Date(d.fecha).toLocaleString('es-CO');
+  let gpsHtml = d.gps ? '<p><strong>GPS:</strong> ' + d.gps.lat + ', ' + d.gps.lon + ' (±' + d.gps.accuracy + ' m)<br><small>' + (d.gps.timestamp || '') + '</small></p>' : '<p><strong>GPS:</strong> No registrado</p>';
+  document.getElementById('modal-contenido').innerHTML = '<h3 style="color:var(--primary);margin-bottom:8px">' + d.nombreVariedad + '</h3>' +
+    '<p style="font-size:0.84rem;margin-bottom:6px"><strong>Confianza:</strong> ' + d.confianza + '% · ' + fecha + '</p>' +
+    (d.imagen ? '<img src="' + d.imagen + '" style="width:100%;max-height:200px;object-fit:contain;border-radius:10px;margin:8px 0">' : '') +
+    '<p style="font-size:0.84rem"><strong>Patología de referencia:</strong> ' + d.plagaPrincipal + '</p>' +
+    gpsHtml +
+    (d.notas ? '<p style="font-size:0.84rem"><strong>Notas:</strong> ' + d.notas + '</p>' : '') +
+    '<button class="btn btn-outline" style="margin-top:12px;color:var(--danger);border-color:var(--danger)" onclick="eliminarDiagnostico(' + d.id + ')">🗑️ Eliminar este registro</button>';
+  document.getElementById('modal').classList.add('show');
+}
+
+function eliminarDiagnostico(id) {
+  const lista = obtenerDiagnosticos().filter(d => d.id !== id);
+  localStorage.setItem('diagnosticos_aguacate', JSON.stringify(lista));
+  cerrarModal();
+  cargarGaleria();
+}
+
+function cerrarModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+function cargarCatalogo() {
+  const cont = document.getElementById('lista-plagas');
+  const q = (document.getElementById('buscar-plaga').value || '').toLowerCase().trim();
+  const lista = q ? PLAGAS.filter(p => p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q) || p.sintomas.toLowerCase().includes(q)) : PLAGAS;
+  if (!lista.length) {
+    cont.innerHTML = '<div class="empty-state"><p>No se encontraron resultados.</p></div>';
+    return;
+  }
+  cont.innerHTML = lista.map((p, i) => {
+    return '<div class="plaga-item"><div class="plaga-header" onclick="togglePlaga(' + i + ')">' +
+      '<div class="plaga-dot" style="background:' + p.color + '"></div>' +
+      '<h4>' + p.nombre + '</h4>' +
+      '<span class="plaga-cat">' + p.categoria + '</span></div>' +
+      '<div class="plaga-body" id="plaga-body-' + i + '">' +
+      '<h5>Síntomas</h5><p>' + p.sintomas + '</p>' +
+      '<h5>Manejo cultural</h5><p>' + p.cultural + '</p>' +
+      '<h5>Control biológico</h5><p>' + p.biologico + '</p>' +
+      '<h5>Control químico</h5><p>' + p.quimico + '</p>' +
+      '<h5>Variedades</h5><p>' + p.variedades.map(v => v.charAt(0).toUpperCase() + v.slice(1)).join(', ') + '</p>' +
+      '</div></div>';
+  }).join('');
+}
+
+function togglePlaga(i) {
+  const el = document.getElementById('plaga-body-' + i);
+  if (el) el.classList.toggle('open');
+}
+
+function filtrarCatalogo() {
+  cargarCatalogo();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  cargarCatalogo();
+});
+</script>
+</body>
+</html>
